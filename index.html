@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FreeFlow Reader</title>
+    <meta
+      name="description"
+      content="A free, frontend-only text to speech web app for reading pasted text, uploaded files, and web articles."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Frontend-only. GitHub Pages ready.</p>
+          <h1>FreeFlow Reader</h1>
+          <p class="hero-text">
+            Upload text files, import Word documents, pull in articles from the
+            web, and listen with browser-based voices for free.
+          </p>
+          <div class="hero-notes">
+            <span>No backend</span>
+            <span>No account</span>
+            <span>No paid API required</span>
+          </div>
+        </div>
+        <aside class="hero-card">
+          <p class="card-label">What this app does well</p>
+          <ul>
+            <li>Reads pasted text and uploaded files</li>
+            <li>Lets you change voice, speed, and pitch</li>
+            <li>Keeps everything in the browser</li>
+          </ul>
+          <p class="card-footnote">
+            Natural voice quality depends on the voices your browser and
+            operating system provide.
+          </p>
+        </aside>
+      </header>
+
+      <main class="app-grid">
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Input</p>
+              <h2>Bring in your text</h2>
+            </div>
+          </div>
+
+          <div class="input-tabs" role="tablist" aria-label="Input method">
+            <button class="tab-button is-active" data-tab="paste" type="button">
+              Paste
+            </button>
+            <button class="tab-button" data-tab="upload" type="button">
+              Upload
+            </button>
+            <button class="tab-button" data-tab="website" type="button">
+              Website
+            </button>
+          </div>
+
+          <div class="tab-panels">
+            <section class="tab-panel is-active" data-panel="paste">
+              <label class="field-label" for="text-input">Text to read</label>
+              <textarea
+                id="text-input"
+                placeholder="Paste text here, write notes, or drop in an article transcript..."
+              ></textarea>
+              <div class="quick-actions">
+                <button id="load-sample" class="secondary-button" type="button">
+                  Load sample text
+                </button>
+                <button id="clear-text" class="ghost-button" type="button">
+                  Clear
+                </button>
+              </div>
+            </section>
+
+            <section class="tab-panel" data-panel="upload">
+              <label class="upload-zone" for="file-input">
+                <input
+                  id="file-input"
+                  type="file"
+                  accept=".txt,.docx,.html,.htm,.md"
+                />
+                <span class="upload-title">Upload a file</span>
+                <span class="upload-subtitle">
+                  Supports plain text, Markdown, HTML, and Word `.docx`
+                  documents.
+                </span>
+              </label>
+              <p class="helper-text" id="file-status">
+                Legacy `.doc` files are not reliably supported in a
+                frontend-only browser app, so `.docx` is the Word format to use.
+              </p>
+            </section>
+
+            <section class="tab-panel" data-panel="website">
+              <label class="field-label" for="website-url">Article URL</label>
+              <div class="url-row">
+                <input
+                  id="website-url"
+                  type="url"
+                  placeholder="https://example.com/article"
+                />
+                <button id="import-url" class="secondary-button" type="button">
+                  Import
+                </button>
+              </div>
+              <p class="helper-text" id="url-status">
+                This uses a public text-extraction mirror from your browser.
+                Some sites may block extraction or render imperfectly.
+              </p>
+            </section>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat">
+              <span class="stat-label">Characters</span>
+              <strong id="character-count">0</strong>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Estimated time</span>
+              <strong id="reading-time">0 min</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel controls-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Voice</p>
+              <h2>Listen your way</h2>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="field-label" for="voice-select">Voice</label>
+            <select id="voice-select"></select>
+          </div>
+
+          <div class="control-group">
+            <div class="range-label-row">
+              <label class="field-label" for="rate-range">Speed</label>
+              <span id="rate-value">1.0x</span>
+            </div>
+            <input
+              id="rate-range"
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value="1"
+            />
+          </div>
+
+          <div class="control-group">
+            <div class="range-label-row">
+              <label class="field-label" for="pitch-range">Pitch</label>
+              <span id="pitch-value">1.0</span>
+            </div>
+            <input
+              id="pitch-range"
+              type="range"
+              min="0.5"
+              max="1.5"
+              step="0.1"
+              value="1"
+            />
+          </div>
+
+          <div class="button-row">
+            <button id="speak-button" class="primary-button" type="button">
+              Start reading
+            </button>
+            <button id="pause-button" class="secondary-button" type="button">
+              Pause
+            </button>
+            <button id="resume-button" class="secondary-button" type="button">
+              Resume
+            </button>
+            <button id="stop-button" class="ghost-button" type="button">
+              Stop
+            </button>
+          </div>
+
+          <div class="status-box" id="speech-status">
+            Ready. Add text and choose a voice to begin.
+          </div>
+        </section>
+
+        <section class="panel preview-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2>Reader text</h2>
+            </div>
+          </div>
+          <div class="preview-text" id="preview-text">
+            Your imported or pasted text will appear here.
+          </div>
+        </section>
+      </main>
+
+      <section class="info-strip">
+        <article>
+          <h3>Best voice quality</h3>
+          <p>
+            Chrome and Edge usually expose the broadest set of voices. If your
+            device has neural system voices installed, they will appear here.
+          </p>
+        </article>
+        <article>
+          <h3>Privacy</h3>
+          <p>
+            Uploaded files are processed in your browser. Website imports use a
+            public fetch mirror only when you choose to import a URL.
+          </p>
+        </article>
+        <article>
+          <h3>Free hosting</h3>
+          <p>
+            This is a static site, so you can deploy it directly to GitHub
+            Pages without paying for a server.
+          </p>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>
