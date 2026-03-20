@@ -24,6 +24,7 @@ let availableVoices = [];
 let queuedChunks = [];
 let currentChunkIndex = 0;
 let speaking = false;
+const PREFERRED_VOICE_NAMES = ["Zoe", "Samantha", "Karen", "Daniel"];
 
 function setStatus(message) {
   speechStatus.textContent = message;
@@ -73,12 +74,19 @@ function populateVoices() {
     voiceSelect.appendChild(option);
   });
 
+  const preferredVoiceIndex = availableVoices.findIndex((voice) =>
+    PREFERRED_VOICE_NAMES.some((preferredName) =>
+      voice.name.toLowerCase().includes(preferredName.toLowerCase())
+    )
+  );
   const englishVoiceIndex = availableVoices.findIndex((voice) =>
     voice.lang.toLowerCase().startsWith("en")
   );
 
   if (previousValue && availableVoices[Number(previousValue)]) {
     voiceSelect.value = previousValue;
+  } else if (preferredVoiceIndex >= 0) {
+    voiceSelect.value = String(preferredVoiceIndex);
   } else if (englishVoiceIndex >= 0) {
     voiceSelect.value = String(englishVoiceIndex);
   } else {
